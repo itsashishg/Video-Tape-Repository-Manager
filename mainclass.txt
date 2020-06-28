@@ -1,0 +1,226 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package javaapplication1;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import javax.swing.*;
+import java.sql.*;
+
+
+class Library extends JFrame implements ActionListener 
+{
+    JPanel p1=new JPanel();
+    JPanel p2=new JPanel();
+    JPanel p3=new JPanel();
+    
+    
+    //For p1
+    JButton New=new JButton("New");
+    JButton Exist=new JButton("Exist");
+    
+    //For p2
+    JLabel l1=new JLabel("Cataloguer");
+    JLabel l2=new JLabel("Title");
+    JLabel l3=new JLabel("Date of Recording");
+    JLabel l4=new JLabel("Library Tape Number");
+    JTextField t1=new JTextField();
+    JTextField t2=new JTextField();
+    JTextField t3=new JTextField();
+    JTextField t4=new JTextField();
+    JButton Save=new JButton("Save Record");
+    JButton Back1=new JButton("<--- Back");
+    
+    //For p3
+    JLabel pl1=new JLabel("Enter Title : ");
+    JTextField pt1=new JTextField();
+    JButton Search=new JButton("Search");
+    JButton Back2=new JButton("<-- Back");
+    JLabel Top=new JLabel("CATALOGUER       TITLE          DATE OF RECORDING                TAPE NUMBER");
+    JTextArea Result=new JTextArea();
+    
+    Library(){
+        setLayout(null);
+        setSize(1900,1000);
+        setVisible(true);
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setTitle("Library Management Project");
+
+        p1.setLayout(null);
+        p1.setSize(1900,1000);
+        p1.setVisible(true);
+        p1.setBackground(Color.ORANGE);
+        
+        p2.setLayout(null);
+        p2.setSize(1900,1000);
+        p2.setVisible(true);
+        p2.setBackground(Color.ORANGE);
+        
+        p3.setLayout(null);
+        p3.setSize(1900,1000);
+        p3.setVisible(true);
+        p3.setBackground(Color.ORANGE);
+        
+        //For p1
+        New.setBounds(850,250,200,100);
+        Exist.setBounds(850,400,200,100);
+        
+        //For p2
+        l1.setBounds(100,100,300,100);
+        l2.setBounds(850,100,300,100);
+        l3.setBounds(100,300,300,100);
+        l4.setBounds(850,300,300,100);
+        t1.setBounds(400,130,300,50);
+        t2.setBounds(1200,130,300,50);
+        t3.setBounds(400,330,300,50);
+        t4.setBounds(1200,330,300,50);
+        Back1.setBounds(500,400,200,50);
+        Save.setBounds(1100,400,200,50);
+        
+        l1.setFont(new Font("Arial",Font.BOLD,30));
+        l2.setFont(new Font("Arial",Font.BOLD,30));
+        l3.setFont(new Font("Arial",Font.BOLD,30));
+        l4.setFont(new Font("Arial",Font.BOLD,30));
+        
+        //For p3
+        pl1.setBounds(620,75,300,100);
+        pt1.setBounds(800,100,200,50);
+        Back2.setBounds(600,200,200,50);
+        Search.setBounds(820,200,200,50);
+        Result.setBounds(620,300,600,400);
+        Top.setBounds(620,250,600,50);
+        
+        pl1.setFont(new Font("Arial",Font.BOLD,30));
+                
+        //For p1
+        p1.add(New);
+        p1.add(Exist);
+        
+        //For p2
+        p2.add(l1);
+        p2.add(l2);
+        p2.add(l3);
+        p2.add(l4);
+        p2.add(t1);
+        p2.add(t2);
+        p2.add(t3);
+        p2.add(t4);
+        p2.add(Save);
+        p2.add(Back1);
+        
+        //For p3
+        p3.add(pl1);
+        p3.add(pt1);
+        p3.add(Search);
+        p3.add(Back2);
+        p3.add(Result);
+        p3.add(Top);
+                        
+        //For p1
+        New.addActionListener(this);
+        Exist.addActionListener(this);
+        
+        //For p2
+        Save.addActionListener(this);
+        Back1.addActionListener(this);
+              
+        //For p3
+        Search.addActionListener(this);
+        Back2.addActionListener(this);
+                
+        add(p1);
+        
+        
+    }
+    
+    public void actionPerformed(ActionEvent e) {
+      if(e.getSource()==New){
+         // remove(p1);
+          setContentPane(p2);
+          invalidate();
+          validate();
+          
+      }
+      else if(e.getSource()==Exist)
+      {
+          setContentPane(p3);
+          invalidate();
+          validate();
+          
+      }
+      else if(e.getSource()==Save)                            //MAIN
+      {
+        
+              try{  
+              //Class.forName("com.mysql.jdbc.Driver");  
+              Connection con=DriverManager.getConnection("jdbc:mysql://localhost:3306/mysql","root","root");  
+              String sql="insert into library(cataloguer,title,dor,ltp) values(?,?,?,?);";
+              PreparedStatement pst=con.prepareStatement(sql);
+              pst.setString(1,t1.getText());
+              pst.setString(2,t2.getText());
+              pst.setString(3,t3.getText());
+              pst.setString(4,t4.getText());
+              pst.execute();
+              
+               
+             }catch(Exception x){ System.out.println(x);} 
+          JOptionPane.showMessageDialog(this,"Record Saved");
+          
+          t1.setText("");
+          t2.setText("");
+          t3.setText("");
+          t4.setText("");
+      }
+      else if(e.getSource()==Back1){
+          setContentPane(p1);
+          invalidate();
+          validate();
+      }
+      else if(e.getSource()==Search)                           //MAIN
+      {
+          String str=new String("");
+         
+          
+           try{  
+                
+              Connection con=DriverManager.getConnection("jdbc:mysql://localhost:3306/mysql","root","root");  //here sonoo is database name, root is username and password  
+              Statement stmt=con.createStatement();
+              ResultSet rs;
+               String name=new String("select * from library where title=?");
+              
+              PreparedStatement pst=con.prepareStatement(name);
+               pst.setString(1,pt1.getText());
+                         
+              rs=pst.executeQuery();
+               
+               while(rs.next()) { 
+                  
+                  str=str+(rs.getString(1)+"\t   "+rs.getString(2)+"\t"+rs.getDate(3)+"\t\t"+rs.getString(4)+"\n");
+                  
+                          }
+               Result.setText(str);
+                  con.close();  
+             }catch(Exception x){ 
+                           JOptionPane.showMessageDialog(this,"No such record found");
+                                }
+          
+      }
+      else if(e.getSource()==Back2){
+          setContentPane(p1);
+          invalidate();
+          validate();
+      }
+    }
+}
+
+public class JavaApplication1 {
+    public static void main(String[] args) {
+         Library l=new Library();
+         
+    }
+    
+}
